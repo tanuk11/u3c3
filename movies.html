@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movies</title>
+    <style>
+
+      #navbar{
+        display: flex;
+        justify-content: space-between;
+      }
+  
+    #movies{
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      grid-template-rows :auto;
+      gap: 10px;
+      margin-top: 10px;
+    
+    }
+    .div{
+      height: 370px;
+      width: 80%;
+      border: 1px solid black;
+    }
+    .div .img
+    {
+      height: 80%;
+      width: 100%;
+    }
+
+    </style>
+  </head>
+  <body>
+    <div id="navbar">
+      <h1>Movie List</h1>
+      <h1 id ="wallet"></h1>
+      <!-- Display the wallet amount here inside h1 tag with id as "wallet". Note only amount, no extra text. Like 500 not Rs 500 -->
+    </div>
+    <div id="search_bar">
+      <!-- input box for searching movies with id as "search" -->
+      <!-- No button should be there for searching movies, it should search with input  -->
+      <input  oninput="debounce(main,1000)" id ="search" type="text"/>
+    
+
+    </div>
+
+    <div id="movies">
+      <!-- Append all searched movies here in grid format -->
+      <!-- Every movie card should have image, title and a book now button  -->
+      <!-- Book now buttons should have class "book_now"  -->
+    </div>
+  </body>
+</html>
+<script>
+  // `https://www.omdbapi.com/?s=${movie}&apikey=1dfdae3d`
+  
+  let a=JSON.parse(localStorage.getItem("amount"))
+  document.getElementById("wallet").append(a)
+
+   
+   let movies_div=document.getElementById("movies");
+   let id;
+
+async function searchMovies(){
+  try{
+    const search=document.getElementById("search").value;
+
+
+    let res=await fetch(`https://www.omdbapi.com/?s=${search}&apikey=1dfdae3d`)
+
+    let data=await res.json();
+  //  console.log("data:",data.Search)
+
+   let movies=data.Search;
+   append(movies)
+  }
+  catch(err){
+    console.log("err:",err)
+  }
+ 
+
+}
+
+function append(data){
+
+  data.forEach(function(el){
+
+    let div=document.createElement("div")
+    div.setAttribute("class","div")
+
+    let image=document.createElement("img")
+    image.src=el.Poster;
+    image.setAttribute("class","img")
+
+    let title=document.createElement("p")
+    title.innerText=el.Title;
+
+    let booking=document.createElement("button")
+    booking.innerText="Book Now";
+    booking.addEventListener("click",function(){
+      book(el);
+    })
+   
+   div.append(image,title,booking)
+
+   movies_div.append(div)
+   
+  
+
+  })
+
+}
+
+async function main(){
+
+let data=await searchMovies();
+
+if (data==undefined){
+  return false;
+}
+append(data)
+
+}
+
+
+function debounce(func,delay){
+ if (id){
+   clearTimeout(id);
+ }
+
+ id=setTimeout(function(){
+   func();
+ },delay)
+}
+  
+
+function book(el){
+
+  window.location.href="checkout.html"
+  
+  // let check=JSON.parse(localStorage.getItem("movies"))
+  localStorage.setItem("movies",JSON.stringify(movies_div))
+}
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
